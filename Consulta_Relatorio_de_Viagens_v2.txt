@@ -1,0 +1,65 @@
+DECLARE @Mes INTEGER
+DECLARE @Ano INTEGER
+
+SET @Mes = 11
+SET @Ano = 2023
+
+SELECT 
+    ve.Placa,
+    sm.CodigoExterno 'Código externo (DT)',
+    sm.DataHoraCadastro 'Cadastro de monitoramento',
+    v.DataHoraCadastro 'Cadastro da viagem',
+    ssm.Nome 'Status monitoramento',
+    sv.Nome 'Status viagem',
+    o.Nome 'Operação da viagem',
+    osm.Nome 'Operação do monitoramento',
+    ove.Nome 'Operação do veículo',
+    sm.DataHoraInicio 'Início do monitoramento',
+    sm.DataHoraFim 'Fim do monitoramento',
+    pco.Nome Origem,
+    pcvto.TempoEspera 'Espera na origem',
+    vpco.DataHoraPrevisaoEntrada 'Previsão Entrada na origem',
+    vpco.DataHoraPrevisaoSaida 'Previsão saída da origem',
+    vpco.DataHoraEntrada 'Entrada na origem',
+    vpco.DataHoraSaida 'Saída da origem',
+    pcc.Nome Coleta,
+    pcvtc.TempoEspera 'Espera na coleta',
+    vpcc.DataHoraPrevisaoEntrada 'Previsão Entrada na coleta',
+    vpcc.DataHoraPrevisaoSaida 'Previsão Saida da coleta',
+    vpcc.DataHoraEntrada 'Entrada na coleta',
+    vpcc.DataHoraSaida 'Saída da coleta',
+    pce.Nome Entrega,
+    pcvte.TempoEspera 'Espera na entrega',
+    vpce.DataHoraPrevisaoEntrada 'Previsão Entrada na entrega',
+    vpce.DataHoraPrevisaoSaida 'Previsão Saída da entrega',
+    vpce.DataHoraEntrada 'Entrada na entrega',
+    vpce.DataHoraSaida 'Saída da entrega',
+    pcd.Nome Destino,
+    pcvtd.TempoEspera 'Espera no destino',
+    vpcd.DataHoraPrevisaoEntrada 'Previsão entrada no destino',
+    vpcd.DataHoraPrevisaoSaida 'Previsão Saída do destino',
+    vpcd.DataHoraEntrada 'Entrada no destino',
+    vpcd.DataHoraSaida 'Saída do destino' 
+FROM 
+    Viagem v
+    JOIN StatusViagem sv ON sv.Id = v.IdStatus
+    LEFT JOIN Operacao o ON v.IdOperacao = o.Id
+    JOIN SolicitacaoMonitoramento sm ON sm.Id = v.IdSolicitacaoMonitoramento
+    LEFT JOIN Operacao osm ON sm.IdOperacao = osm.Id
+    JOIN StatusSolicitacaoMonitoramento ssm ON ssm.Id = sm.IdStatus
+    JOIN Veiculo ve ON ve.Id = v.IdVeiculoTracao
+    LEFT JOIN Operacao ove ON ve.IdOperacao = ove.Id
+    JOIN ViagemPontoControle vpco ON vpco.IdViagem = v.Id AND vpco.IdTipoPontoControle = 1
+    JOIN PontoControle pco ON pco.Id = vpco.IdPontoControle
+    LEFT JOIN PontoControleVinculoTempo pcvto ON pcvto.IdPontoControle = pco.id AND pcvto.IdTipoVinculoPontoControle = 1
+    LEFT JOIN ViagemPontoControle vpcc ON vpcc.IdViagem = v.Id AND vpcc.IdTipoPontoControle = 2
+    LEFT JOIN PontoControle pcc ON pcc.Id = vpcc.IdPontoControle
+    LEFT JOIN PontoControleVinculoTempo pcvtc ON pcvtc.IdPontoControle = pcc.id AND pcvtc.IdTipoVinculoPontoControle = 2
+    LEFT JOIN ViagemPontoControle vpce ON vpce.IdViagem = v.Id AND vpce.IdTipoPontoControle = 3
+    LEFT JOIN PontoControle pce ON pce.Id = vpce.IdPontoControle
+    LEFT JOIN PontoControleVinculoTempo pcvte ON pcvte.IdPontoControle = pce.id AND pcvte.IdTipoVinculoPontoControle = 3
+    JOIN ViagemPontoControle vpcd ON vpcd.IdViagem = v.Id AND vpcd.IdTipoPontoControle = 4
+    JOIN PontoControle pcd ON pcd.Id = vpcd.IdPontoControle
+    LEFT JOIN PontoControleVinculoTempo pcvtd ON pcvtd.IdPontoControle = pcd.id AND pcvtd.IdTipoVinculoPontoControle = 4
+ORDER BY 
+    v.DataHoraCadastro;
